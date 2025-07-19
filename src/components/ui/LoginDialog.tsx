@@ -4,7 +4,7 @@ import { Button } from './button';
 import { Input } from './input';
 import { useToast } from '@/components/ui/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Eye, EyeOff, Google } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 type AuthMode = 'login' | 'signup' | 'reset';
 
