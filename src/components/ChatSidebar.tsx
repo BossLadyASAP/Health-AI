@@ -116,53 +116,6 @@ export function ChatSidebar({
                 </Button>
                 
                 {/* User Profile Dropdown */}
-                {isLoggedIn ? (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        className="flex items-center gap-2 border border-gray-200 hover:bg-gray-50 px-2"
-                      >
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback className="text-xs bg-blue-600 text-white">
-                            {user.name.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <ChevronDown className="h-3 w-3" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end">
-                      <DropdownMenuItem onClick={() => {}}>
-                        <TrendingUp className="h-4 w-4 mr-2" />
-                        Upgrade my plan
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setShowSettings(true)}>
-                        <Settings className="h-4 w-4 mr-2" />
-                        Settings
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => {}}>
-                        <HelpCircle className="h-4 w-4 mr-2" />
-                        Help
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="h-4 w-4 mr-2" />
-                        Log out
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                ) : (
-                  <Button 
-                    onClick={handleLogin}
-                    size="sm"
-                    className="flex items-center gap-2 border border-gray-200 hover:bg-gray-50"
-                    variant="ghost"
-                  >
-                    <User className="h-4 w-4" />
-                    Login
-                  </Button>
-                )}
               </div>
             )}
           </div>

@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Message as LucideMessage, Send, MessageSquare } from 'lucide-react';
+import { Message as LucideMessage, Send, MessageSquare, ChevronDown, User, LogOut, Settings, HelpCircle, Crown } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { VoiceInput } from '@/components/VoiceInput';
+import { useAuth } from '@/hooks/useAuth';
+import { LoginDialog } from '@/components/ui/LoginDialog';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 
 interface ChatInterfaceProps {
   conversation: {
@@ -47,6 +50,8 @@ export function ChatInterface({ conversation, onSendMessage, selectedModel }: Ch
   const [message, setMessage] = useState('');
   const [isVoiceListening, setIsVoiceListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { user, signOut } = useAuth();
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -76,6 +81,8 @@ export function ChatInterface({ conversation, onSendMessage, selectedModel }: Ch
     }
   };
 
+  const freeCredits = user ? 5 : 2;
+
   return (
     <div className="flex flex-col h-full max-w-4xl mx-auto">
       {/* Header */}
@@ -84,7 +91,44 @@ export function ChatInterface({ conversation, onSendMessage, selectedModel }: Ch
           {conversation?.title || 'New Conversation'}
         </h1>
         <div className="flex items-center gap-2 text-sm text-gray-500">
-          <span>Model: {selectedModel}</span>
+          {!user ? (
+            <>
+              <Button variant="outline" onClick={() => setLoginDialogOpen(true)}>
+                Login
+              </Button>
+              <LoginDialog open={loginDialogOpen} onOpenChange={setLoginDialogOpen} />
+            </>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="flex items-center gap-2 border border-gray-200 px-2">
+                  <User className="h-5 w-5" />
+                  <span>{user.user_metadata?.first_name || user.email}</span>
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem onClick={() => { /* TODO: Upgrade plan */ }}>
+                  <Crown className="h-4 w-4 mr-2" />
+                  Upgrade my plan
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { /* TODO: Open settings */ }}>
+                  <Settings className="h-4 w-4 mr-2" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => { /* TODO: Help */ }}>
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  Help
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut()}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Log out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+          <span className="ml-4 text-gray-400 text-xs">Free credits: {freeCredits}</span>
         </div>
       </div>
 
@@ -114,9 +158,10 @@ export function ChatInterface({ conversation, onSendMessage, selectedModel }: Ch
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Type your message..."
+              placeholder={user ? "Type your message..." : "Sign in to chat..."}
               className="min-h-[60px] resize-none"
               rows={3}
+              disabled={!user}
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -124,10 +169,11 @@ export function ChatInterface({ conversation, onSendMessage, selectedModel }: Ch
               onTranscription={handleVoiceTranscription}
               isListening={isVoiceListening}
               className="w-full"
+              disabled={!user}
             />
             <Button 
               type="submit" 
-              disabled={!message.trim()}
+              disabled={!message.trim() || !user}
               className="flex items-center gap-2"
             >
               <Send className="h-4 w-4" />
